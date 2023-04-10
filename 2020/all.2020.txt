@@ -1,0 +1,1180 @@
+#!/usr/local/bin/python3
+
+
+N = 2020
+s = list()
+with open('input1.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        n = int(line.strip())
+        s += [n]
+
+L = len(s)
+for i in range(L):
+    for j in range(i+1, L):
+        d = 2020 - (s[i] + s[j])
+        if d in s:
+            print(s[i] * s[j] * d)
+            break
+#!/usr/local/bin/python3
+import re
+
+cnt = 0
+with open('day2.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        m = re.search(r'^(\d+)-(\d+)\s+(\S):\s+(\S+)', line.strip())
+        if m:
+            v1, v2, c, s = m.groups()
+            # if int(v1) <= s.count(c) <= int(v2):
+            #     cnt += 1
+            if (s[int(v1) - 1] == c and s[int(v2) - 1] != c) or \
+               (s[int(v1) - 1] != c and s[int(v2) - 1] == c):
+                cnt += 1
+        else:
+            print('ERROR')
+            break
+print(cnt)
+#!/usr/local/bin/python3
+
+
+# -- read into matrix --
+m = []
+with open('day3b.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        m += [list(line.strip())]
+X = len(m)
+Y = len(m[0])
+
+# -- follow the direction --
+d = [(1, 1), (1, 3), (1, 5), (1, 7), (2, 1)]
+prod = 1
+for dx, dy in d:
+    cnt = 0
+    x, y = 0, 0
+    while True:
+        x += dx
+        y += dy
+        y %= Y
+        if x >= X:
+            break
+        if m[x][y] == '#':
+            cnt += 1
+    prod *= cnt
+print(prod)
+#!/usr/local/bin/python3
+import re
+
+
+def is_valid_field(key, val):
+    if key == 'byr' and (not 1920 <= int(val) <= 2002 or len(val) != 4):
+        return False
+    elif key == 'iyr' and (not 2010 <= int(val) <= 2020 or len(val) != 4):
+        return False
+    elif key == 'eyr' and (not 2020 <= int(val) <= 2030 or len(val) != 4):
+        return False
+    elif key == 'hgt':
+        if 'cm' in val:
+            val = val.replace('cm', '')
+            if not 150 <= int(val) <= 193:
+                return False
+        elif 'in' in val:
+            val = val.replace('in', '')
+            if not 59 <= int(val) <= 76:
+                return False
+        else:
+            return False
+    elif key == 'hcl' and not re.search(r'^#[0-9a-f]{6}$', val):
+        return False
+    elif key == 'ecl' and val not in S:
+        return False
+    elif key == 'pid' and not re.search(r'^\d{9}$', val):
+        return False
+    return True
+
+
+def is_valid(v):
+    for key, val in v.items():
+        if not is_valid_field(key, val):
+            return False
+    return True
+
+
+K1 = set(['byr', 'iyr', 'eyr', 'hgt', 'hcl', 'ecl', 'pid'])
+K2 = K1.union(set(['cid']))
+S = set('amb blu brn gry grn hzl oth'.split())
+v = dict()
+cnt = 0
+with open('day4b.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        s = line.strip()
+        if not line:
+            break
+        s = line.strip()
+        if re.search(r'^\s*$', s):
+            keys = v.keys()
+            if keys == K1 or keys == K2:
+                if is_valid(v):
+                    cnt += 1
+            v = dict()
+        else:
+            si = s.split()
+            for sii in si:
+                key, val = sii.split(':')
+                v[key] = val
+print(cnt)
+#!/usr/local/bin/python3
+
+
+def seat_id(s):
+    L, R = 0, 127
+    for i in range(7):
+        M = (L + R) // 2
+        if s[i] == 'F':
+            R = M
+        elif s[i] == 'B':
+            L = M + 1
+    assert(L == R)
+    v = L
+    L, R = 0, 7
+    for i in range(7, 10):
+        M = (L + R) // 2
+        if s[i] == 'R':
+            L = M + 1
+        elif s[i] == 'L':
+            R = M
+    assert(L == R)
+    v = v*8 + L
+    return v
+
+
+m, M = 0, 0
+S = set()
+with open('day5a.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        s = line.strip()
+        if not line:
+            break
+        s = line.strip()
+        v = seat_id(s)
+        M = max(M, v)
+        m = min(m, v)
+        S.add(v)
+
+print('First answer:')
+print(M)
+print('Second answer:')
+for si in range(m, M+1):
+    if si not in S:
+        if (si == m):
+            if si + 1 in S:
+                print(si)
+        elif si - 1 in S and si + 1 in S:
+            print(si)
+#!/usr/local/bin/python3
+import re
+
+
+v = set()
+cnt = 0
+NEW = True
+with open('day6b.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        s = line.strip()
+        if re.search(r'^\s*$', s):
+            cnt += len(v)
+            v = set()
+            NEW = True
+        else:
+            if NEW:
+                v.update(list(s))
+                NEW = False
+            else:
+                v = v.intersection(list(s))
+print(cnt)
+#!/usr/local/bin/python3
+import re
+
+
+# -- read input into dict --
+H = {}
+with open('day7b.txt', 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        s = line.strip()
+        s = s.replace(' contain ', '')
+        v = re.split(r' bags?[,.]?\s?', s)[:-1]
+        m = v[1:]
+        if m != ['no other']:
+            H[v[0]] = {k: int(v) for v, k in map(lambda s: s.split(' ', 1), m)}
+
+
+def contain_shiny_gold(s):
+    if s not in H:
+        return False
+    elif 'shiny gold' in H[s]:
+        return True
+    else:
+        for k in H[s].keys():
+            if contain_shiny_gold(k):
+                return True
+    return False
+
+
+def calculate(s):
+    if s not in H:
+        return 1
+    else:
+        return 1 + sum(calculate(k)*v for k, v in H[s].items())
+
+
+# -- for each key, recursively resolve until 'no other' --
+cnt = 0
+for k in H.keys():
+    if contain_shiny_gold(k):
+        cnt += 1
+
+print('First  answer:', cnt)
+
+print('Second answer:', calculate('shiny gold') - 1)
+#!/usr/local/bin/python3
+
+
+def execute(P):
+    ln = 0
+    S = set()
+    acc = 0
+    while ln in P:
+        cmd, val = P[ln].split()
+        if cmd == 'nop':
+            ln += 1
+        elif cmd == 'acc':
+            ln += 1
+            acc += int(val)
+        elif cmd == 'jmp':
+            ln += int(val)
+        if ln in S:
+            return 'CYCLE', acc
+        S.add(ln)
+    return 'TERMINATE', acc
+
+
+if __name__ == "__main__":
+
+    # -- read input --
+    H = {}
+    line_number = 0
+    with open('day8b.txt', 'r', encoding='ascii') as f:
+        while True:
+            line = f.readline()
+            if not line:
+                break
+            s = line.strip()
+            H[line_number] = s
+            line_number += 1
+
+    print('First question:', execute(H)[1])
+
+    for k in sorted(H.keys()):
+        if 'nop' in H[k]:
+            P = dict(H)
+            P[k] = H[k].replace('nop', 'jmp')
+        elif 'jmp' in H[k]:
+            P = dict(H)
+            P[k] = H[k].replace('jmp', 'nop')
+        else:
+            continue
+        res, acc = execute(P)
+        if res == 'TERMINATE':
+            print('Second question:', acc)
+#!/usr/local/bin/python3
+from collections import deque
+
+
+# W, FILE = 5, 'day9.txt'
+W, FILE = 25, 'day9a.txt'
+w = deque()
+L = []
+i = 0
+fn = True
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        s = line.strip()
+        s = int(s)
+        if i < W:
+            w.append(s)
+        else:
+            if not any(s - wi in w for wi in w) and fn:
+                FN = s
+                print('First number:', s)
+                fn = False
+            w.popleft()
+            w.append(s)
+        L.append(s)
+        i += 1
+
+# -- second part --
+w.clear()
+S = 0
+for Li in L:
+    if S < FN:
+        S += Li
+        w.append(Li)
+    elif S == FN:
+        print('Second number:', min(w) + max(w))
+        break
+    while S > FN and w:
+        Si = w.popleft()
+        S -= Si
+#!/usr/local/bin/python3
+
+
+# FILE = 'day10b.txt'
+# FILE = 'day10a.txt'
+FILE = 'day10.txt'
+S = []
+M = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        v = int(line.strip())
+        M = max(M, v)
+        S.append(v)
+S.append(0)
+S.append(M + 3)
+S.sort()
+H = {1: 0, 3: 0}
+for i in range(1, len(S)):
+    H[S[i] - S[i-1]] += 1
+print('First answer:', H[1]*H[3])
+
+A = {0: 1}
+for i in range(1, len(S)):
+    v = 0
+    for j in range(1, 4):
+        if S[i] - j in S:
+            v += A[S[i] - j]
+    A[S[i]] = v
+print('Second answer:', A[S[-1]])
+#!/usr/local/bin/python3
+from copy import deepcopy
+
+
+# FILE = 'day11a.txt'
+FILE = 'day11b.txt'
+# -- read matrix --
+m = []
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        m += [list(line.strip())]
+X = len(m)
+Y = len(m[0])
+D = [(x, y) for x in range(-1, 2) for y in range(-1, 2) if (x, y) != (0, 0)]
+
+
+def next_iter_1(m):
+    n = deepcopy(m)
+    for i in range(X):
+        for j in range(Y):
+            if m[i][j] == '.':
+                continue
+            busy_adj = 0
+            for dx, dy in D:
+                x = i + dx
+                y = j + dy
+                if 0 <= x < X and 0 <= y < Y and m[x][y] == '#':
+                    busy_adj += 1
+            if m[i][j] == 'L' and busy_adj == 0:
+                n[i][j] = '#'
+            if m[i][j] == '#' and busy_adj >= 4:
+                n[i][j] = 'L'
+    return n
+
+
+def next_iter_2(m):
+    n = deepcopy(m)
+    for i in range(X):
+        for j in range(Y):
+            if m[i][j] == '.':
+                continue
+            busy_adj = 0
+            for dx, dy in D:
+                x = i + dx
+                y = j + dy
+                while 0 <= x < X and 0 <= y < Y:
+                    if m[x][y] == '#':
+                        busy_adj += 1
+                        break
+                    elif m[x][y] == 'L':
+                        break
+                    x += dx
+                    y += dy
+            if m[i][j] == 'L' and busy_adj == 0:
+                n[i][j] = '#'
+            if m[i][j] == '#' and busy_adj >= 5:
+                n[i][j] = 'L'
+    return n
+
+
+def equal(m, n):
+    for i in range(X):
+        for j in range(Y):
+            if m[i][j] != n[i][j]:
+                return False
+    return True
+
+
+def busy(m):
+    cnt = 0
+    for i in range(X):
+        for j in range(Y):
+            if m[i][j] == '#':
+                cnt += 1
+    return cnt
+
+
+def steady(m, next_iter):
+    while True:
+        n = next_iter(m)
+        if equal(m, n):
+            break
+        m = deepcopy(n)
+    return m
+
+
+print('First answer:', busy(steady(m, next_iter_1)))
+print('Second answer:', busy(steady(m, next_iter_2)))
+#!/usr/local/bin/python3
+from math import sqrt
+
+
+# FILE = 'day12a.txt'
+FILE = 'day12b.txt'
+x, y = 0, 0
+Di = 0
+D = [(1, 0), (0, -1), (-1, 0), (0, 1)]
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        cmd, val = line[0], int(line[1:])
+        if cmd == 'F':
+            dx, dy = D[Di]
+            x += (dx*val)//sqrt(dx**2 + dy**2)
+            y += (dy*val)//sqrt(dx**2 + dy**2)
+        elif cmd == 'N':
+            y += val
+        elif cmd == 'S':
+            y -= val
+        elif cmd == 'E':
+            x += val
+        elif cmd == 'W':
+            x -= val
+        elif cmd == 'R':
+            Di = (Di + val//90) % 4
+        elif cmd == 'L':
+            Di = (Di - val//90) % 4
+print('First answer:', int(abs(x) + abs(y)))
+
+
+wpx, wpy = 10, 1
+x, y = 0, 0
+Di = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        cmd, val = line[0], int(line[1:])
+        if cmd == 'F':
+            x += val * wpx
+            y += val * wpy
+        elif cmd == 'N':
+            wpy += val
+        elif cmd == 'S':
+            wpy -= val
+        elif cmd == 'E':
+            wpx += val
+        elif cmd == 'W':
+            wpx -= val
+        elif cmd == 'R' or cmd == 'L':
+            if cmd == 'R':
+                sign = 1
+            else:
+                sign = -1
+            Di = (sign * val//90) % 4
+            wpx, wpy = [(wpx, wpy), (wpy, -wpx), (-wpx, -wpy), (-wpy, wpx)][Di]
+print('Second answer:', int(abs(x) + abs(y)))
+#!/usr/local/bin/python3
+'''
+Basic application of the Chinese Remainder Theorem
+'''
+from sympy.ntheory.modular import crt
+
+
+# FILE = 'day13a.txt'
+FILE = 'day13b.txt'
+with open(FILE, 'r') as f:
+    n0 = int(f.readline())
+    v = f.readline().split(',')
+    buses = [int(vi) for vi in v if vi != 'x']
+    residues = [-i for i, vi in enumerate(v) if vi != 'x']
+
+n = n0
+loop = True
+while True:
+    for bi in buses:
+        if n % bi == 0:
+            loop = False
+            break
+    if not loop:
+        break
+    n += 1
+print('First answer:', (n-n0)*bi)
+
+print('Second answer:', crt(buses, residues)[0])
+#!/usr/local/bin/python3
+
+
+def maskme(v, mask):
+    r = 0
+    p = 1
+    for i in range(36):
+        if mask[i] == 'X':
+            r += v & p
+        elif mask[i] == '1':
+            r += p
+        p <<= 1
+    return r
+
+
+def maskaddress(address, mask):
+    r, p = '', 1
+    for i in range(36):
+        if mask[i] == '0':
+            r += str((address & p) >> i)
+        else:
+            r += mask[i]
+        p <<= 1
+    l1 = [r]
+    while True:
+        l2 = []
+        for li in l1:
+            if 'X' not in li:
+                continue
+            for i in range(2):
+                l2 += [li.replace('X', str(i), 1)]
+        if not l2:
+            break
+        l1 = list(l2)
+    return list(map(lambda x: int(x, 2), l1))
+
+
+# FILE = 'day14a.txt'
+FILE = 'day14b.txt'
+# FILE = 'day14c.txt'
+MEM = {}
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        v = line.strip().split(' = ')
+        if v[0] == 'mask':
+            mask = v[1][::-1]
+        else:
+            address = int(v[0].replace('mem[', '').replace(']', ''))
+            MEM[address] = maskme(int(v[1]), mask)
+print('First answer:', sum(MEM.values()))
+
+MEM = {}
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        v = line.strip().split(' = ')
+        if v[0] == 'mask':
+            mask = v[1][::-1]
+        else:
+            BASE = int(v[0].replace('mem[', '').replace(']', ''))
+            for address in maskaddress(BASE, mask):
+                MEM[address] = int(v[1])
+print('Second answer:', sum(MEM.values()))
+#!/usr/local/bin/python3
+
+
+def simulate(v, N):
+    last_index = {k: v for v, k in enumerate(v[:-1], 1)}
+    current = v[-1]
+    for k in range(len(v) + 1, N + 1):
+        if current not in last_index:
+            key = 0
+        else:
+            key = k - 1 - last_index[current]
+        last_index[current] = k - 1
+        current = key
+    return current
+
+
+v = [8, 13, 1, 0, 18, 9]
+
+print('First answer:', simulate(v, 2020))
+print('Second answer:', simulate(v, 30000000))
+#!/usr/local/bin/python3
+import re
+
+
+def valid_rules(x):
+    for r in rules:
+        if r[0] <= x <= r[1] or r[2] <= x <= r[3]:
+            return True
+    return False
+
+
+def matches_rules(x):
+    x = int(x)
+    if x in MEM:
+        return MEM[x]
+    st = set()
+    for i, r in enumerate(rules):
+        if r[0] <= x <= r[1] or r[2] <= x <= r[3]:
+            st.add(i)
+    MEM[x] = st
+    return st
+
+
+# FILE = 'day16a.txt'
+FILE = 'day16b.txt'
+# FILE = 'day16c.txt'
+MEM = {}
+PHASE = 0
+rules = []
+valid = []
+cnt = 0
+mine = []
+rule_names = []
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        v = line.strip().split(':')
+        if v[0] == 'your ticket':
+            PHASE = 1
+        elif v[0] == 'nearby tickets':
+            PHASE = 2
+        elif PHASE == 0 and len(v) == 2:
+            rules += [list(map(int, re.split(r'\D+', v[1].strip())))]
+            rule_names += [v[0]]
+        elif PHASE == 1:
+            if ',' in v[0]:
+                mine = v[0].split(',')
+        elif PHASE == 2:
+            isValid = True
+            for vi in v[0].split(','):
+                vi = int(vi)
+                if not valid_rules(vi):
+                    cnt += vi
+                    isValid = False
+            if isValid:
+                valid += [v[0].split(',')]
+print('First answer:', cnt)
+# D[index] -> which rules are feasible
+D = [matches_rules(vii) for vii in valid[0]]
+for vi in valid[1:]:
+    for i, vii in enumerate(vi):
+        D[i] = D[i].intersection(matches_rules(vii))
+lst = sorted((len(di), i, di) for i, di in enumerate(D))
+S = set()
+prod = 1
+for _, _index, _rules in lst:
+    _rules = {i for i in _rules if i not in S}
+    if len(_rules) == 1:
+        S.update(_rules)
+    else:
+        print('ERROR: Not ready for this!')
+        exit(-1)
+    if re.search(r'^departure', rule_names[_rules.pop()]):
+        prod *= int(mine[_index])
+print('Second answer:', prod)
+#!/usr/local/bin/python3
+
+
+# -- consts --
+D3 = [(x, y, z) for x in range(-1, 2) for y in range(-1, 2)
+      for z in range(-1, 2) if (x, y, z) != (0, 0, 0)]
+D4 = [(x, y, z, w) for x in range(-1, 2) for y in range(-1, 2)
+      for z in range(-1, 2) for w in range(-1, 2)
+      if (x, y, z, w) != (0, 0, 0, 0)]
+
+
+'''
+def _print_(s):
+    for z in range(B[2][0], B[2][1] + 1):
+        for x in range(B[0][0], B[0][1] + 1):
+            for y in range(B[1][0], B[1][1] + 1):
+                if (x, y, z) in s:
+                    print('#', end='')
+                else:
+                    print('.', end='')
+            print()
+        print()
+'''
+
+
+def _add_(active, v):
+    global B
+    B = [[min(B[i][0], vi), max(B[i][1], vi)] for i, vi in enumerate(v)]
+    active.add(v)
+
+
+def _neighs_(v):
+    if DIM == 3:
+        x, y, z = v
+        r = []
+        for dx, dy, dz in D3:
+            r += [(x+dx, y+dy, z+dz)]
+        return r
+    elif DIM == 4:
+        x, y, z, w = v
+        r = []
+        for dx, dy, dz, dw in D4:
+            r += [(x+dx, y+dy, z+dz, w+dw)]
+        return r
+
+
+def _next_(active):
+    global B
+    inactive = set()
+    new_active = set()
+    B = [[100, -100] for _ in range(DIM)]
+    for v in active:
+        cnt = 0
+        for vi in _neighs_(v):
+            if vi in active:
+                cnt += 1
+            else:
+                inactive.add(vi)
+        if cnt == 2 or cnt == 3:
+            _add_(new_active, v)
+    for v in inactive:
+        cnt = 0
+        for vi in _neighs_(v):
+            if vi in active:
+                cnt += 1
+        if cnt == 3:
+            _add_(new_active, v)
+    return new_active
+
+
+# -- read the matrix --
+# FILE = 'day17a.txt'
+FILE = 'day17b.txt'
+DIM = 3
+B = [[100, -100] for _ in range(DIM)]
+active = set()
+i = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        for j, v in enumerate(list(line.strip())):
+            if v == '#':
+                _add_(active, (i, j, 0))
+        i += 1
+
+# -- iterations --
+for _ in range(6):
+    active = _next_(active)
+print('First answer:', len(active))
+
+# -- read the matrix --
+DIM = 4
+B = [[100, -100] for _ in range(DIM)]
+active = set()
+i = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        for j, v in enumerate(list(line.strip())):
+            if v == '#':
+                _add_(active, (i, j, 0, 0))
+        i += 1
+
+# -- iterations --
+for _ in range(6):
+    active = _next_(active)
+print('Second answer:', len(active))
+#!/usr/local/bin/python3
+
+
+# FILE = 'day18a.txt'
+FILE = 'day18b.txt'
+total_sum = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        q = []
+        line = line.strip().replace(' ', '')
+        for v in list(line):
+            q.append(v)
+            doIt = True
+            while doIt:
+                doIt = False
+                while len(q) > 2 and q[-1] not in '()' and q[-2] not in '()' \
+                        and q[-3] not in '()':
+                    a = int(q.pop())
+                    op = q.pop()
+                    b = int(q.pop())
+                    if op == '+':
+                        q.append(str(a + b))
+                    elif op == '*':
+                        q.append(str(a * b))
+                    doIt = True
+                while len(q) > 2 and q[-1] == ')' and q[-3] == '(':
+                    q.pop()
+                    v = q.pop()
+                    q.pop()
+                    q.append(v)
+                    doIt = True
+        total_sum += int(q.pop())
+print('First answer:', total_sum)
+total_sum = 0
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        q = []
+        line = line.strip().replace(' ', '')
+        for v in list(line):
+            q.append(v)
+            doIt = True
+            while doIt:
+                doIt = False
+                while len(q) > 2 and q[-1] not in '()' and q[-2] == '+' \
+                        and q[-3] not in '()':
+                    a = int(q.pop())
+                    op = q.pop()
+                    b = int(q.pop())
+                    q.append(str(a + b))
+                    doIt = True
+                if len(q) > 2 and q[-1] == ')':
+                    q.pop()
+                    prod = 1
+                    while True:
+                        v = q.pop()
+                        if v == '(':
+                            break
+                        elif v == '*':
+                            continue
+                        assert(v != '+')
+                        prod *= int(v)
+                    q.append(str(prod))
+                    doIt = True
+        while len(q) > 2 and q[-1] not in '()' and q[-2] == '*' \
+                and q[-3] not in '()':
+            a = int(q.pop())
+            op = q.pop()
+            b = int(q.pop())
+            q.append(str(a * b))
+        v = int(q.pop())
+        total_sum += v
+print('second answer:', total_sum)
+#!/usr/local/bin/python3
+import re
+
+
+def match(rule, s):
+    if R[rule] == 'a' or R[rule] == 'b':
+        if len(s) < 1 or s[0] != R[rule]:
+            return [None]
+        else:
+            return [s[1:]]
+    else:
+        res = []
+        rules = R[rule].split('|')
+        for r in rules:
+            r = list(map(int, r.split()))
+            v = [s]
+            for ri in r:
+                vv = []
+                for vi in v:
+                    vv.extend([si for si in match(ri, vi) if si is not None])
+                v = list(vv)
+            res.extend(v)
+        return res
+
+
+# -- read the input --
+R = {}
+S = []
+# FILE = 'day19a.txt'
+FILE = 'day19b.txt'
+# FILE = 'day19c.txt'
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        line = line.strip()
+        m = re.search(r'(\d+): "?([^"]+)"?', line)
+        if m:
+            R[int(m.group(1))] = m.group(2)
+        elif line != '':
+            S += [line]
+
+# -- results --
+print('First answer:', sum('' in match(0, s) for s in S))
+
+R[8] = '42 | 42 42 | 42 42 42 | 42 42 42 42 | 42 42 42 42 42'
+R[11] = '42 31 | 42 42 31 31 | 42 42 42 31 31 31 | 42 42 42 42 31 31 31 31'
+# TODO FIXME: The correct approach would be to add new items to rules list in
+# case of 'recursive' option (8, 11). This only needs to be done until
+# the v returns empty.
+print('Second answer:', sum('' in match(0, s) for s in S))
+#!/usr/local/bin/python3
+from collections import Counter
+import re
+
+
+def rh(s):
+    return '\n'.join(reversed(s.splitlines()))
+
+
+def rv(s):
+    return '\n'.join(map(lambda s: s[::-1], s.splitlines()))
+
+
+def rhv(s):
+    return rv(rh(s))
+
+
+def flip(s):
+    ls = s.splitlines()
+    L = len(ls[0])
+    M = len(ls)
+    r = ['' for _ in range(L)]
+    for i in range(L):
+        for j in range(M):
+            r[i] += ls[j][i]
+    return rv('\n'.join(r))
+
+
+def rotPlus90(s):
+    return flip(s)
+
+
+def rotMinus90(s):
+    return rhv(flip(s))
+
+
+FILE = 'day20a.txt'
+FILE = 'day20b.txt'
+H = {}
+# Count the number of corners that are unmatched
+CNT = Counter()
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        line = line.strip()
+        m = re.search(r'Tile (\d+)', line)
+        if m:
+            tile = m.group(1)
+            i = 0
+            a, b, c, d = '', '', '', ''
+        elif re.search(r'^\s*$', line):
+            H[tile] = []
+            for k in [a, b, c, d]:
+                key = sorted([k, k[::-1]])[0]
+                CNT[key] += 1
+                H[tile] += [k]
+        else:
+            if i == 0:
+                a = line
+            elif i == 9:
+                c = line
+            b += line[9]
+            d += line[0]
+            i += 1
+# Corner image squares will have two unmatched edges
+prod = 1
+UL = ''
+for tile in H:
+    cnt = 0
+    for corner in H[tile]:
+        if CNT[corner] == 1 or CNT[corner[::-1]] == 1:
+            cnt += 1
+    if cnt == 2:
+        prod *= int(tile)
+        if not UL:
+            UL = tile
+print('First answer:', prod)
+#
+# 1. Put together the complete image
+# 2. For each possible rotation of the dragon,
+#    find them inside the image
+#!/usr/local/bin/python3
+from collections import Counter
+
+
+# FILE = 'day21a.txt'
+FILE = 'day21b.txt'
+H = {}
+CNT = Counter()
+with open(FILE, 'r') as f:
+    while True:
+        line = f.readline()
+        if not line:
+            break
+        line = line.strip().replace(')', '').split(' (contains ')
+        sl = line[0].split(' ')
+        CNT += Counter(sl)
+        S = set(sl)
+        for item in line[1].split(', '):
+            if item not in H:
+                H[item] = S
+            else:
+                H[item] = H[item].intersection(S)
+bound = set()
+LOOP = True
+r = []
+while LOOP:
+    LOOP = False
+    for item in H:
+        intersect = H[item].difference(bound)
+        ln = len(intersect)
+        if ln == 1:
+            v = intersect.pop()
+            r += [(item, v)]
+            bound.add(v)
+        elif ln > 1:
+            LOOP = True
+print('First answer:', sum(CNT[i] for i in CNT if i not in bound))
+r.sort()
+print('Second answer:', ','.join(ri for _, ri in r))
+#!/usr/bin/env python3
+
+
+def dest(p, t, M):
+    while True:
+        p -= 1
+        if p == 0:
+            p = M
+        if p not in t:
+            return p
+
+
+def move(a, M, n, fmt='first'):
+    # create the circular data structure
+    N = {}
+    ai = a[0]
+    for bi in a[1:]:
+        N[ai] = bi
+        ai = bi
+    La = len(a)
+    if La == M:
+        N[a[-1]] = a[0]
+    else:
+        N[a[-1]] = La+1
+        for i in range(La+1, M):
+            N[i] = i+1
+        N[M] = a[0]
+    # simulate moves
+    p = a[0]
+    for _ in range(n):
+        t = [N[p], N[N[p]], N[N[N[p]]]]
+        N[p] = N[t[-1]]
+        d = dest(p, t, M)
+        N[t[-1]] = N[d]
+        N[d] = t[0]
+        # new 'p'
+        p = N[p]
+    if fmt == 'first':
+        v = 1
+        s = ''
+        for _ in range(len(N)-1):
+            s += str(N[v])
+            v = N[v]
+        return s
+    else:
+        return N[1] * N[N[1]]
+
+
+# -- test --
+# a = list(map(int, list('389125467')))
+# -- input --
+a = list(map(int, list('476138259')))
+print('First answer:', move(a, len(a), 100))
+print('Second answer:', move(a, 1000000, 10000000, fmt='second'))
+#!/usr/bin/env python3
+
+
+def find_index(S):
+    V1 = 1
+    i = 1
+    while True:
+        V1 *= 7
+        V1 %= M
+        if V1 == S:
+            return i
+        i += 1
+
+
+# -- init --
+M = 20201227
+V1 = 1
+H1 = {}
+V2 = 1
+H2 = {}
+
+# -- test --
+# S1 = 17807724
+# S2 = 5764801
+
+# -- validate --
+S1 = 10943862
+S2 = 12721030
+
+N1 = find_index(S1)
+N2 = find_index(S2)
+
+for i in range(1, 1 + N2):
+    V1 *= S1
+    V1 %= M
+for i in range(1, 1 + N1):
+    V2 *= S2
+    V2 %= M
+assert(V1 == V2)
+print('First answer:', V1)
